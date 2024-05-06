@@ -11,7 +11,6 @@
 HANDLE SaveManager<GameData>::hwnd{};
 
 
-
 template<typename T>
 void SaveManager<T>::LoadDefinitions(string definitions[])
 {
@@ -20,45 +19,81 @@ void SaveManager<T>::LoadDefinitions(string definitions[])
 
 	ifstream inputStream = ifstream();
 
-	inputStream.open("../definitions.txt");
-
 	Vector2<int> centerPos;
 	centerPos.x = ConsoleHandler::GetConsoleSize().x / 2;
 	centerPos.y = (ConsoleHandler::GetConsoleSize().y / 2);
 
-	if (inputStream.good())
+	string confirm = "Definitions loaded OK";
+	string error = "The file could not be opened";
+	string reading = "Reading from the data file...";
+
+	try
 	{
-		int i = 0;
-		while (!inputStream.eof())
+		centerPos.x -= reading.length() / 2;
+		ConsoleHandler::SetCursorPos(centerPos);
+		cout << reading << endl;
+
+		inputStream.open("../definitions.txt");
+
+		if (!inputStream.good())
 		{
-			char tempText[bufferSize];
+			centerPos.x = ConsoleHandler::GetConsoleSize().x / 2 - error.length() / 2;
+			centerPos.y++;
+			ConsoleHandler::SetCursorPos(centerPos);
 
-			inputStream.getline(tempText, bufferSize);
+			throw ofstream::failure(error);
+		}		
+		else
+		{
+			centerPos.x = ConsoleHandler::GetConsoleSize().x / 2 - confirm.length() / 2;
+			centerPos.y++;
+			ConsoleHandler::SetCursorPos(centerPos);
+			cout << confirm;
 
-			definitions[i] = tempText;
-			i++;
+			int i = 0;
+			while (!inputStream.eof())
+			{
+				char tempText[bufferSize];
+
+				inputStream.getline(tempText, bufferSize);
+
+				definitions[i] = tempText;
+				i++;
+			}
 		}
 
-		cout << "Definitions loaded OK" << endl;
+		Sleep(2000);
+
+		inputStream.close();
 	}
-	else
+	catch (const ifstream::failure& exception)
 	{
-		cout << "No se pudo cargar definitons" << endl;
-		//throw error
+		cerr << "INPUT FILE STREAM ERROR: " << exception.what() << endl;
+
+		if (inputStream.is_open())
+		{
+			inputStream.close();
+		}
 	}
-	inputStream.close();
 }
 
 template<typename T>
 T SaveManager<T>::LoadDataFile(string filePath)
 {
 	T data = T();
-
 	ifstream binaryInput = ifstream();
+
+	string reading = "Reading from the data file...";
+
+	Vector2<int> newPos;
+	newPos.x = ConsoleHandler::GetConsoleSize().x / 2 - reading.length();
+	newPos.y = (ConsoleHandler::GetConsoleSize().y / 2) + 2;
 
 	try
 	{
-		cout << "Reading from the data file..." << endl;
+		newPos.x = ConsoleHandler::GetConsoleSize().x / 2 - reading.length();
+		newPos.y = (ConsoleHandler::GetConsoleSize().y / 2) + 2;
+		cout << reading << endl;
 
 		binaryInput.open(filePath, ios::in | ios::binary);
 

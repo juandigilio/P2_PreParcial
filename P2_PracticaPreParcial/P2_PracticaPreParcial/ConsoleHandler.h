@@ -18,5 +18,6 @@ public:
 	static void DrawFrame(int delay);
 	static HANDLE GetHandle();
 	static Vector2<int> GetConsoleSize();
+	static void SetCursorPos(Vector2<int> pos);
 };
 

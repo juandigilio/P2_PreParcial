@@ -6,10 +6,7 @@
 #include <iostream>
 #include <Windows.h>
 
-
 using namespace std;
-
-
 
 class Game
 {
@@ -20,19 +17,23 @@ private:
 	string centerWord;
 	string definitions[totalWords];
 
-	GameData* gameData;
-	PlayerData* playerData;
+	GameData gameData;
+	PlayerData playerData;
 
-	
+	void SetConsoleConfiguration();
+	void InitGame();
+	void LoadSave();
+	void DrawBoard();
+	void DrawDefinitions();
+	void GetInput();
+	void GameLoop();
 	void SetCursorPos(Vector2<int> pos);
 	void SetCursorPos(Word word);
-	void LoadSave(GameData& gameData, PlayerData& playerData);
 
 public:
-	Game(GameData& gameData, PlayerData& playerData);
+	Game();
 	~Game();
 
-	void DrawBoard(GameData& gameData);
-	void DrawDefinitions();
+	void RunGame();
 };
 

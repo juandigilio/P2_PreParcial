@@ -12,15 +12,7 @@ using namespace std;
 
 void main()
 {
-	ConsoleHandler::SetFontSize(20, 25);
-	ConsoleHandler::SetConsoleSize();
-	ConsoleHandler::DrawFrame(0);
-
-	GameData gameData{};
-	PlayerData playerData{};
-
-	Game game = Game(gameData, playerData);
-	game.DrawDefinitions();
-	//game.DrawBoard(gameData);
+	Game game = Game();
+	game.RunGame();
 
 }

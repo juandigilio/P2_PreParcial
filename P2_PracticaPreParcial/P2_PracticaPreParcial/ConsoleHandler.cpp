@@ -153,3 +153,10 @@ Vector2<int> ConsoleHandler::GetConsoleSize()
 {
 	return Vector2<int>(consoleSize.X, consoleSize.Y);
 }
+
+void ConsoleHandler::SetCursorPos(Vector2<int> pos)
+{
+	COORD actualPos{ pos.x, pos.y };
+
+	SetConsoleCursorPosition(hwnd, actualPos);
+}
