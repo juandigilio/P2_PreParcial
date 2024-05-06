@@ -2,6 +2,8 @@
 #include <Windows.h>
 
 #include "ConsoleHandler.h"
+#include "GameData.h"
+#include "SaveManager.h"
 #include "Game.h"
 
 
@@ -10,11 +12,15 @@ using namespace std;
 
 void main()
 {
-	//ConsoleHandler::SetConsoleSize();
-	//ConsoleHandler::DrawFrame(0);
+	ConsoleHandler::SetFontSize(20, 25);
+	ConsoleHandler::SetConsoleSize();
+	ConsoleHandler::DrawFrame(0);
 
-	Game game = Game();
-	game.SaveData();
-	game.DrawBoard();
+	GameData gameData{};
+	PlayerData playerData{};
+
+	Game game = Game(gameData, playerData);
+	game.DrawDefinitions();
+	//game.DrawBoard(gameData);
 
 }

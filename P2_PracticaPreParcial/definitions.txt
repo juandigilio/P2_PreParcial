@@ -1,5 +1,5 @@
-1-La comida del aliento rico (ajo)
-2-Figura geometrica en 3 dimensiones de 6 caras iguales (cubo)
-3-Metodo utilizado por Python para el manejo del tipo de variables y administracion de la memoria (magia)
-4-Dicese que el Ocarina of time esta totalmente... (roto)
-5-Forma super vintage de decir que sos un kapo (maestro)
+1-La comida del aliento rico.
+2-Figura geometrica de 6 caras iguales.
+3-En que se basa la fisica cuantica.
+4-Dicese que el Ocarina of time esta totalmente.
+5-Forma super vintage de decir que sos un kapo.

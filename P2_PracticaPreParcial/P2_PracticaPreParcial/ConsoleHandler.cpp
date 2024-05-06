@@ -5,48 +5,45 @@
 
 using namespace std;
 
-COORD ConsoleHandler::consoleSize = {90, 40};
+COORD ConsoleHandler::consoleSize = {35, 25};
 COORD ConsoleHandler::cursorPosition = { 0, 0 };
 HANDLE ConsoleHandler::hwnd{};
+Vector2<int> ConsoleHandler::centerPos{};
+
+void ConsoleHandler::SetFontSize(int width, int height)
+{
+	CONSOLE_FONT_INFOEX cfi;
+	cfi.cbSize = sizeof(cfi);
+	cfi.nFont = 0;
+
+	cfi.dwFontSize.X = width;
+	cfi.dwFontSize.Y = height;
+	cfi.FontFamily = FF_DONTCARE;
+	cfi.FontWeight = FW_NORMAL;
+
+	wcscpy_s(cfi.FaceName, L"Lucida Console");
+	SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &cfi);
+}
 
 void ConsoleHandler::SetConsoleSize()
 {
-	/*do 
+	do 
 	{
 		system("cls");
 
-		cout << "Ingrese el ancho para la consola (min 40, max 90): ";
+		cout << "Ingrese el ancho para la consola (min 50, max 70): ";
 		cin >> consoleSize.X;
 
-		if (consoleSize.X < 40)
-		{
-
-		}
-		else if (consoleSize.X > 90)
-		{
-
-		}
-
-	} while (consoleSize.X < 40 || consoleSize.X > 90);
+	} while (consoleSize.X < 50 || consoleSize.X > 70);
 
 	do
 	{
 		system("cls");
 
-		cout << "Ingrese el alto para la consola (min 30, max 40): ";
+		cout << "Ingrese el alto para la consola (min 15, max 25): ";
 		cin >> consoleSize.Y;
 
-		if (consoleSize.Y < 30)
-		{
-			
-		}
-		else if (consoleSize.Y > 40)
-		{
-
-		}
-
-	} while (consoleSize.Y < 30 || consoleSize.Y > 40);
-	*/
+	} while (consoleSize.Y < 15 || consoleSize.Y > 25);
 
 	SMALL_RECT rect;
 
@@ -63,13 +60,13 @@ void ConsoleHandler::SetConsoleSize()
 	GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cci);
 	cci.bVisible = 0;
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cci);
+
+	centerPos.x = consoleSize.X / 2;
+	centerPos.y = (consoleSize.Y / 2);
 }
 
 void ConsoleHandler::DrawFrame(int delay)
 {
-	consoleSize.X = 90;
-	consoleSize.Y = 40;
-
 	system("cls");
 
 	cout << (char)201;

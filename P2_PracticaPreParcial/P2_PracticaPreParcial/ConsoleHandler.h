@@ -12,6 +12,8 @@ private:
 	static HANDLE hwnd;
 
 public:
+	static Vector2<int> centerPos;
+	static void SetFontSize(int width, int height);
 	static void SetConsoleSize();
 	static void DrawFrame(int delay);
 	static HANDLE GetHandle();

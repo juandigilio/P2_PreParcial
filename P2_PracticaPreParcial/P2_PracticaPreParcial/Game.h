@@ -1,41 +1,38 @@
 #pragma once
 
 #include "Vector2.h"
+#include "GameData.h"
 
 #include <iostream>
 #include <Windows.h>
 
+
 using namespace std;
 
-struct Word
-{
-	string word;
-	Vector2<int> position;
-	bool wasDiscovered;
-};
+
 
 class Game
 {
 private:
 	HANDLE hwnd;
-	Word* wordsToGuess;
-	string* definitions;
-	int totalWords;
-	int totalHits;
 	Vector2<int> centerPos;
 	Vector2<int> cursorPos;
 	string centerWord;
+	string definitions[totalWords];
+
+	GameData* gameData;
+	PlayerData* playerData;
 
 	
-	
-	void DrawWord(Word word);
+	void SetCursorPos(Vector2<int> pos);
+	void SetCursorPos(Word word);
+	void LoadSave(GameData& gameData, PlayerData& playerData);
 
 public:
-	Game();
+	Game(GameData& gameData, PlayerData& playerData);
 	~Game();
 
-	void LoadData();
-	void SaveData();
-	void DrawBoard();
+	void DrawBoard(GameData& gameData);
+	void DrawDefinitions();
 };
 

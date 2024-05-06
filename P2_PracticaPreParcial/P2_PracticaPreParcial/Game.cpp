@@ -1,185 +1,183 @@
 #include "Game.h"
 
 #include "ConsoleHandler.h"
-#include <fstream>
+#include "SaveManager.h"
 
-Game::Game()
+#include <fstream>
+#include <conio.h>
+
+Game::Game(GameData& gameData, PlayerData& playerData)
 {
 	hwnd = ConsoleHandler::GetHandle();
-	totalWords = 5;
 
-	centerPos.x = ConsoleHandler::GetConsoleSize().x / 2;
-	centerPos.y = (ConsoleHandler::GetConsoleSize().y / 2) - (totalWords / 2);
+	this->gameData = &gameData;
+	this->playerData = &playerData;
 
-	wordsToGuess = new Word[totalWords];
-	definitions = new string[totalWords];
-	
-	wordsToGuess[0].word = "ajo";
-	wordsToGuess[0].position.x = centerPos.x - 1;
-	wordsToGuess[0].position.y = centerPos.y;
+	this->centerPos = ConsoleHandler::centerPos;
 
-	wordsToGuess[1].word = "cubo";
-	wordsToGuess[1].position.x = centerPos.x - 1;
-	wordsToGuess[1].position.y = centerPos.y + 1;
-
-	wordsToGuess[2].word = "magia";
-	wordsToGuess[2].position.x = centerPos.x - 2;
-	wordsToGuess[2].position.y = centerPos.y + 2;
-
-	wordsToGuess[3].word = "roto";
-	wordsToGuess[3].position.x = centerPos.x - 1;
-	wordsToGuess[3].position.y = centerPos.y + 3;
-
-	wordsToGuess[4].word = "maestro";
-	wordsToGuess[4].position.x = centerPos.x - 3;
-	wordsToGuess[4].position.y = centerPos.y + 4;
+	string words[totalWords];
+	words[0] = "AJO.";
+	words[1] = "CUBO.";
+	words[2] = "MAGIA.";
+	words[3] = "ROTO.";
+	words[4] = "MAESTRO.";
 
 	for (int i = 0; i < totalWords; i++)
 	{
-		wordsToGuess[i].wasDiscovered = false;
+		for (int j = 0; j < words[i].length(); j++)
+		{
+			gameData.wordsToGuess[i].word[j] = words[i][j];
+		}
+
+		gameData.wordsToGuess[i].wasDiscovered = false;
 	}
+
+	gameData.wordsToGuess[0].positionX = centerPos.x - 1;
+	gameData.wordsToGuess[0].positionY = centerPos.y;
+	
+	gameData.wordsToGuess[1].positionX = centerPos.x - 1;
+	gameData.wordsToGuess[1].positionY = centerPos.y + 1;
+	
+	gameData.wordsToGuess[2].positionX = centerPos.x - 2;
+	gameData.wordsToGuess[2].positionY = centerPos.y + 2;
+	
+	gameData.wordsToGuess[3].positionX = centerPos.x - 1;
+	gameData.wordsToGuess[3].positionY = centerPos.y + 3;
+	
+	gameData.wordsToGuess[4].positionX = centerPos.x - 3;
+	gameData.wordsToGuess[4].positionY = centerPos.y + 4;
 
 	centerWord = "JUGOS";
 
-	//LoadData();
+	SaveManager<GameData>::LoadDefinitions(definitions);
+
+	LoadSave(gameData, playerData);
 }
 
 Game::~Game()
 {
-	delete[] wordsToGuess;
-	delete[] definitions;
+	SaveManager<GameData>::SaveDataFile(*gameData, gameDataPath);
+	SaveManager<PlayerData>::SaveDataFile(*playerData, playerDataPath);
 }
 
-void Game::LoadData()
+
+void Game::DrawBoard(GameData& gameData)
 {
-	const int bufferSize = 128;
-
-	ifstream inputStream = ifstream();
-
-	inputStream.open("../definitions.txt");
-
-	if (inputStream.good())
-	{
-		int i = 0;
-		while (!inputStream.eof())
-		{
-			char tempText[bufferSize];
-
-			inputStream.getline(tempText, bufferSize);
-
-			definitions[i] = tempText;
-			i++;
-		}
-	}
-	else
-	{
-		cout << "No se pudo cargar definitons" << endl;
-		//throw error
-	}
-	inputStream.close();
-
-	ifstream binariInput("../gameSave.bin", std::ios::binary);
-
-	if (binariInput.is_open())
-	{
-		binariInput.read(reinterpret_cast<char*>(&totalWords), sizeof(int));
-
-		wordsToGuess = new Word[totalWords];
-		definitions = new std::string[totalWords];
-
-		for (int i = 0; i < totalWords; i++)
-		{
-			int wordLength;
-			binariInput.read(reinterpret_cast<char*>(&wordLength), sizeof(int));
-
-			char* buffer = new char[wordLength + 1];
-			binariInput.read(buffer, wordLength);
-			buffer[wordLength] = '\0';
-			wordsToGuess[i].word = std::string(buffer);
-			delete[] buffer;
-
-			binariInput.read(reinterpret_cast<char*>(&wordsToGuess[i].position), sizeof(int));
-
-			binariInput.read(reinterpret_cast<char*>(&wordsToGuess[i].wasDiscovered), sizeof(bool));
-		}
-
-		binariInput.close();
-
-		std::cout << "Binari loaded!" << std::endl;
-	}
-	else
-	{
-		std::cerr << "Binari error!" << std::endl;
-	}
-}
-
-void Game::SaveData()
-{
-	ofstream outputStream("../gameSave.bin", std::ios::binary);
-
-	if (outputStream.is_open())
-	{
-		outputStream.write(reinterpret_cast<char*>(&totalWords), sizeof(int));
-		
-		for (int i = 0; i < totalWords; i++)
-		{			
-			int wordLength = wordsToGuess[i].word.length();
-			outputStream.write(reinterpret_cast<char*>(&wordLength), sizeof(int));
-			
-			outputStream.write(wordsToGuess[i].word.c_str(), wordLength);
-			
-			outputStream.write(reinterpret_cast<char*>(&wordsToGuess[i].position), sizeof(int));
-
-			outputStream.write(reinterpret_cast<char*>(&wordsToGuess[i].wasDiscovered), sizeof(bool));
-		}
-
-		outputStream.close();
-
-		std::cout << "Game saved!" << std::endl;
-	}
-	else
-	{
-		std::cerr << "Save error!" << std::endl;
-	}
-}
-
-void Game::DrawBoard()
-{
-	COORD actualPos;
-
 	for (int i = 0; i < totalWords; i++)
 	{
-		actualPos.X = wordsToGuess[i].position.x;
-		actualPos.Y = wordsToGuess[i].position.y;
-		SetConsoleCursorPosition(hwnd, actualPos);
+		cout << gameData.wordsToGuess[i].word << endl;
 
-		for (int j = 0; j < wordsToGuess[i].word.length(); j++)
+		Vector2<int> newPos{ gameData.wordsToGuess[i].positionX, gameData.wordsToGuess[i].positionY };
+		SetCursorPos(newPos);
+
+		int j = 0;
+
+		while (gameData.wordsToGuess[i].word[j] != '.')
 		{
-			if (!wordsToGuess[i].wasDiscovered)
+			if (!gameData.wordsToGuess[i].wasDiscovered)
 			{
 				cout << "_";
 			}
 			else
 			{
-				cout << wordsToGuess[i].word[j];
+				cout << gameData.wordsToGuess[i].word[j];
 			}
 		}
 	}
 
-	actualPos.X = centerPos.x;
-	actualPos.Y = centerPos.y;
+	Vector2<int> newPos{ centerPos.x , centerPos.y };
 
 	for (int i = 0; i < centerWord.length(); i++)
 	{
-		SetConsoleCursorPosition(hwnd, actualPos);
+		SetCursorPos(newPos);
 
 		cout << centerWord[i];
 
-		actualPos.Y++;
+		newPos.y++;
 	}
 }
 
-void Game::DrawWord(Word word)
+void Game::SetCursorPos(Vector2<int> pos)
 {
+	COORD actualPos{ pos.x, pos.y };
+
+	SetConsoleCursorPosition(hwnd, actualPos);
+}
+
+void Game::SetCursorPos(Word word)
+{
+	COORD actualPos{ word.positionX, word.positionY };
+
+	SetConsoleCursorPosition(hwnd, actualPos);
+}
+
+void Game::DrawDefinitions()
+{
+	Vector2<int> newPos{ 1, 2 };
+
+	for (int i = 0; i < totalWords; i++)
+	{
+		int j = 0;
+
+		SetCursorPos(newPos);
+
+		while (definitions[i][j] != '.')
+		{
+			cout << definitions[i][j];
+			j++;
+		}
+
+		newPos.y++;
+
+		cin.get();
+	}
+
+	
+}
+
+void Game::LoadSave(GameData& gameData, PlayerData& playerData)
+{
+	string question = "Desea cargar la partida anterior? : Y/N";
+	string newGame = "Nueva partida creada, presione cualquier tecla para continuar";
+	char input{};
+	cursorPos = { centerPos.x, centerPos.y };
+
+	ifstream binaryInput = ifstream();
+	binaryInput.open(gameDataPath, ios::in | ios::binary);
+
+	if (binaryInput.is_open())
+	{
+		cursorPos.x -= question.length() / 2;
+		SetCursorPos(cursorPos);
+
+		cout << question;
+
+		do
+		{
+			input = toupper(_getch());
+
+		} while (input != 'Y' && input != 'N');
+
+		if (input == 'Y')
+		{
+			gameData = SaveManager<GameData>::LoadDataFile(gameDataPath);
+			playerData = SaveManager<PlayerData>::LoadDataFile(playerDataPath);
+		}
+		else
+		{
+			cursorPos = centerPos;
+			cursorPos.y++;
+			cursorPos.x -= newGame.length() / 2;
+			SetCursorPos(cursorPos);
+			cout << newGame;
+		}
+	}
+	else
+	{
+		cursorPos.x -= newGame.length() / 2;
+		SetCursorPos(cursorPos);
+		cout << newGame;
+	}
+
 }
 

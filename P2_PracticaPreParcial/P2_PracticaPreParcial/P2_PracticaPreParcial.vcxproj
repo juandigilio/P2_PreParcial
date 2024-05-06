@@ -130,11 +130,14 @@
     <ClCompile Include="ConsoleHandler.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SaveManager.cpp" />
     <ClCompile Include="Vector2.tpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConsoleHandler.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameData.h" />
+    <ClInclude Include="SaveManager.h" />
     <ClInclude Include="Vector2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
